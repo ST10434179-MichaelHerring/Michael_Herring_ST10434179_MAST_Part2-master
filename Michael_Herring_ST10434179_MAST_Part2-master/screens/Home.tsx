@@ -14,7 +14,7 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
   ? menuItems.reduce((sum, item) => sum + item.price, 0) / menuItems.length 
   : 0;
 
-  //removal of a menu item
+  //remove menu items
   const removeItem = (index: number) => {
     Alert.alert(
       "Remove Item",
@@ -51,10 +51,12 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
       <View style={styles.box}>
         <Text style={styles.CurrentMenu}>Current Menu</Text>
 
+{/*Total items and average price display*/} 
         <View style={styles.MenuBox}>
           <Text style={styles.TotalItems}>Total Items: {menuItems.length}</Text>
           <Text style={styles.averagePrice}>Average Price: ${averagePrice.toFixed(2)}</Text>
 
+{/*list of all the menu items*/}
           <FlatList
             data={menuItems}
             keyExtractor={(item, index) => index.toString()}

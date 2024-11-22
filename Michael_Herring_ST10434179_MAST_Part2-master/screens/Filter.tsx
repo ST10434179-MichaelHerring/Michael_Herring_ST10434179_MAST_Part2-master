@@ -48,6 +48,7 @@ export default function FilterMenuScreen({ route, navigation }: FilterMenuScreen
           <Picker.Item label="Desserts" value="Desserts" />
         </Picker>
 
+{/*list of all filtered items*/}
         <FlatList
           data={filteredItems}
           keyExtractor={(item, index) => index.toString()}
