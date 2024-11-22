@@ -1,4 +1,3 @@
-// screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { Image, View, Text, Button, FlatList, StyleSheet, Dimensions, Alert, ToastAndroid } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,96 +6,76 @@ import { RootStackParamList } from '../types';
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation, route }: HomeScreenProps) {
-  {/* constants for adding items to the menu*/}
-  const [menuItems, setMenuItems] = useState<{ dishName: string, description: string, course: string, price: number }[]>([]);
-
-  
-
+  // Initialize menuItems state from route.params or default to an empty array
+  const [menuItems, setMenuItems] = useState<{ dishName: string, description: string, course: string, price: number }[]>(route.params?.menuItems || []);
 
   // Calculate average price
   const averagePrice = menuItems.length > 0 
   ? menuItems.reduce((sum, item) => sum + item.price, 0) / menuItems.length 
   : 0;
 
-
-  // Handle removal of a menu item
+  //removal of a menu item
   const removeItem = (index: number) => {
     Alert.alert(
       "Remove Item",
       "Are you sure you want to remove this item?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "OK", onPress: () => setMenuItems(menuItems.filter((_, i) => i !== index)) }
+        { text: "OK", onPress: () => {
+          const updatedMenuItems = menuItems.filter((_, i) => i !== index);
+          setMenuItems(updatedMenuItems);
+          navigation.setParams({ menuItems: updatedMenuItems }); // Update the global state
+        }}
       ]
     );
   };
 
-
- // Check if newItem exists in route.params and add it to the menu
   useEffect(() => {
+    // Update the menuItems state when the new item is added from the 'AddItems' screen
     if (route.params?.newItem) {
-      setMenuItems((prevItems) => [...prevItems, route.params.newItem as { dishName: string; description: string; course: string; price: number }]);
+      const updatedMenuItems = [...menuItems, route.params.newItem];
+      setMenuItems(updatedMenuItems);
+      navigation.setParams({ menuItems: updatedMenuItems }); // Update the global state
     }
   }, [route.params?.newItem]);
 
  
-
-  // Get the device's width and height (if needed later)
-  const { width, height } = Dimensions.get('window');
-
-  const showToast = () => {
-    ToastAndroid.show(menuItems.length.toString(), ToastAndroid.SHORT);
-  };
-
-  
-
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>Welcome to</Text>
       <Text style={styles.title}>Chef's Menu</Text> 
       <Image source={require('../assets/images/BowlofFood.png')} style={styles.imgBowl}/> 
 
-      
-      <Button title='tasto' onPress={showToast}/>
-      
+    
 
       <View style={styles.box}>
-
         <Text style={styles.CurrentMenu}>Current Menu</Text>
 
-        
         <View style={styles.MenuBox}>
+          <Text style={styles.TotalItems}>Total Items: {menuItems.length}</Text>
+          <Text style={styles.averagePrice}>Average Price: ${averagePrice.toFixed(2)}</Text>
 
-
-    {/* Displays total amount of items on menu*/}
-    
-        <Text style={styles.TotalItems}>Total Items: {menuItems.length}</Text>
-        <Text style={styles.averagePrice}>Average Price: ${averagePrice.toFixed(2)}</Text>
-
-    {/*flatlist displaying all items on the menu aswel as added items*/}
           <FlatList
-          data={menuItems}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => (
-            <View style={styles.menuItem}>
-              <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
-              <Text>{item.description}</Text>
-              <Text>${item.price.toFixed(2)}</Text>
-              <Button title="Remove" color="red" onPress={() => removeItem(index)} />
-            </View>
-          )}
+            data={menuItems}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <View style={styles.menuItem}>
+                <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
+                <Text>{item.description}</Text>
+                <Text>${item.price.toFixed(2)}</Text>
+                <Button title="Remove" color="red" onPress={() => removeItem(index)} />
+              </View>
+            )}
           />
-          
         </View>
-{/* buttons to navigate to add menu/items screen and filter screen*/}
-        <Button title="Add Menu" onPress={() => navigation.navigate('AddItems')} />
-        <Button title="Filter Menu" onPress={() => navigation.navigate('Filter', { menuItems })} />
 
+        <Button title="Add Menu" onPress={() => navigation.navigate('AddItems', { menuItems })} />
+        <Button title="Filter Menu" onPress={() => navigation.navigate('Filter', { menuItems })} />
       </View>
-      
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({  
   container: {

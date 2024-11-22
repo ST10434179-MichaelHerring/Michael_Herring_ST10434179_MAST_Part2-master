@@ -1,4 +1,3 @@
-// screens/AddMenuScreen.tsx
 import React, { useState } from 'react';
 import { Image, View, Text, TextInput, Button, StyleSheet, Dimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -9,37 +8,29 @@ const courses = ['Starters', 'Mains', 'Desserts'];
 
 type AddMenuScreenProps = NativeStackScreenProps<RootStackParamList, 'AddItems'>;
 
-export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
+export default function AddMenuScreen({ navigation, route }: AddMenuScreenProps) {
   const [dishName, setDishName] = useState('');
   const [description, setDescription] = useState('');
   const [course, setCourse] = useState(courses[0]);
   const [price, setPrice] = useState('');
 
-  /* const handleSubmit = () => {
-    const newItem = { dishName, description, course, price: parseFloat(price) };
-    navigation.navigate('Home', { menuItems: newItem });
-
-  }; */
- 
   const handleSubmit = () => {
     const newItem = { dishName, description, course, price: parseFloat(price) };
-    navigation.navigate('Home', { newItem }); // Correct parameter name
+    
+    // Navigate back to HomeScreen and pass the new item
+    if (route.params?.menuItems) {
+      const updatedMenuItems = [...route.params.menuItems, newItem];
+      navigation.navigate('Home', { menuItems: updatedMenuItems }); // Update menuItems in HomeScreen
+    } else {
+      navigation.navigate('Home', { menuItems: [newItem] }); // First time adding an item
+    }
   };
-  
-
-
-
-  // Get the device's width and height (if needed later (it is needed))
-  const { width, height } = Dimensions.get('window');
 
   return (
     <View style={styles.container}>
-
-    <Image source={require('../assets/images/ChefCooking.png')} style={styles.imgChef}/>
+      <Image source={require('../assets/images/ChefCooking.png')} style={styles.imgChef}/>
       <View style={styles.box}>
         <Text style={styles.Heading}>Add Items</Text>
-
-        {/*TextInputs with labels to enter the appropriate info for each dish*/}
 
         <Text style={styles.label}>Dish Name:</Text>
         <TextInput style={styles.input} onChangeText={setDishName} value={dishName} />
@@ -48,22 +39,15 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
         <TextInput style={styles.description} onChangeText={setDescription} value={description} />
 
         <Text style={styles.label}>Course:</Text>
-        {/* a picker to choose the course that the meal is in*/}
         <Picker selectedValue={course} onValueChange={setCourse} style={styles.picker} > 
           {courses.map((course) => (
             <Picker.Item key={course} label={course} value={course} />
           ))}
         </Picker>
 
-          {/*Setting the input type for price*/}
         <Text style={styles.label}>Price:</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={setPrice}
-          value={price}
-          keyboardType="numeric"
-        />
-      {/* adds the dish to the menu*/}
+        <TextInput style={styles.input} onChangeText={setPrice} value={price} keyboardType="numeric" />
+
         <Button title="Add Dish" onPress={handleSubmit} />
       </View>
     </View>

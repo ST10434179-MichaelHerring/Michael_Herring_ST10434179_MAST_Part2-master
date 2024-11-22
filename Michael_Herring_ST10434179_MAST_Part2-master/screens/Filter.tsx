@@ -1,4 +1,3 @@
-// screens/FilterMenuScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { Image, View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -23,9 +22,10 @@ export default function FilterMenuScreen({ route, navigation }: FilterMenuScreen
     }
   };
 
+  // Apply the filter when selectedCourse changes
   useEffect(() => {
-    filterByCourse(selectedCourse); // Apply filter 
-  }, [selectedCourse]);
+    filterByCourse(selectedCourse); // Apply filter
+  }, [selectedCourse, menuItems]); // Also re-run the filter if menuItems changes
 
   const { width, height } = Dimensions.get('window');
 
